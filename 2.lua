@@ -1,4 +1,3 @@
-print('fuck you nigga')
 local S = setmetatable({}, {__index = function(t, k) local s = game:GetService(k); t[k] = s; return s end})
 local repo = 'https://raw.githubusercontent.com/mstudio45/LinoriaLib/main/'
 local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/lelo0002/hai../refs/heads/main/roxylinoria.lua'))()
@@ -38,12 +37,12 @@ local L={}
 L.DMax=2000 L.FIn=0.15 L.FOut=0.15 L.Font=2 L.CType="Highlight" L.CB="AlwaysOnTop" L.CShrink=1.2 L.BThick=0.5 L.BOThick=3 L.HGE=true
 L.BC=Color3.fromRGB(255,255,255) L.BFC=Color3.fromRGB(84,132,171) L.NTC=Color3.fromRGB(255,255,255) L.WTC=Color3.fromRGB(255,255,255)
 L.DTC=Color3.fromRGB(255,255,255) L.HHC=Color3.fromRGB(0,255,0) L.HLC=Color3.fromRGB(255,0,0) L.HTC=Color3.fromRGB(255,255,255) L.ATC=Color3.fromRGB(255,255,255)
-L.CC=Color3.fromRGB(84,132,171) L.CTrans=0.5 L.ID={} L.CD={} L.AD={} L.DD={} L.WD={} L.ND={} L.BD={} L.BOD={} L.BFD={} L.HD={} L.HOD={} L.HTD={}
+L.CC=Color3.fromRGB(84,132,171) L.CTrans=0.5 L.ID={} L.CD={} L.AD={} L.DD={} L.WD={} L.ND={} L.BD={} L.BOD={} L.BFD={} L.HD={} L.HOD={} L.HTD={} L.SKD={}
 L.AC=setmetatable({},{__mode="k"}) L.CH=setmetatable({},{__mode="k"}) L.VH=setmetatable({},{__mode="k"}) L.FC=setmetatable({},{__mode="k"})
 L.HTFC=setmetatable({},{__mode="k"}) L.IFC=setmetatable({},{__mode="k"}) L.CFC=setmetatable({},{__mode="k"})
-local espCache, itemCache, crateCache, gunPartCache, xtCache = {}, {}, {}, {}, {}
-L.Cache = {ESP = espCache, Item = itemCache, Crate = crateCache, Gun = gunPartCache, XT = xtCache, Target = {}}
-L.State = {ACT_TRC = {}, HBOC = setmetatable({}, {__mode = "k"}), lastVK = 0, vkCooldown = 0, PriorityTargets = setmetatable({}, {__mode = "k"}), lastGunCheck = 0, lastXtCheck = 0, xtPoints = {}}
+local espCache, itemCache, crateCache, gunPartCache, charPartCache, xtCache = {}, {}, {}, {}, {}, {}
+L.Cache = {ESP = espCache, Item = itemCache, Crate = crateCache, Gun = gunPartCache, Char = charPartCache, XT = xtCache, Target = {}}
+L.State = {ACT_TRC = {}, HBOC = setmetatable({}, {__mode = "k"}), CHOC = setmetatable({}, {__mode = "k"}), TF = setmetatable({}, {__mode = "k"}), lastVK = 0, vkCooldown = 0, PriorityTargets = setmetatable({}, {__mode = "k"}), lastGunCheck = 0, lastCharCheck = 0, lastXtCheck = 0, xtPoints = {}, charChildCount = 0, armorChildCount = 0, ccmHash = ""}
 L.Connections = {}
 L.BTE=false L.BTC=Color3.fromRGB(83,132,171) L.BTS=0.1 L.BTA=3 L.BTD=1.5 L.BTSt="1"
 L.XHE=false L.XHC=Color3.fromRGB(255,255,255) L.XHS=false L.XHL=false L.XHR=false L.XRR=false L.XS=20 L.XSp=150 L.XT=1 L.XG=2 L.XSt="1" L.XP="Center Of Screen" L.XEF=2 L.XEC=Color3.new(1,1,1)
@@ -53,7 +52,10 @@ L.W_BE=false L.W_BC=Color3.fromRGB(255,255,255) L.W_BS=24 L.W_BT=2 L.W_BI=1
 L.W_HSE=false L.W_HSV=1 L.W_HSS="Neverlose"
 L.W_KSE=false L.W_KSV=1 L.W_KSS="Neverlose"
 L.CE_E=false L.CEC=Color3.new(1,1,1) L.CRC=false L.CDMax=5000 L.CSort={Common=true,Uncommon=true,Rare=true,Epic=true,Legendary=true,Mythic=true,Divine=true} L.CFont=2
-L.FlyE=false L.FlyS=20 L.FE=false L.PE=false L.WFE=false L.FCOC=Color3.fromRGB(0,255,100) L.PCOC=Color3.fromRGB(255,100,0) L.Friendlies={} L.Priorities={}
+L.FlyE=false L.FlyS=20 L.FE=false L.PE=false L.WFE=false L.FCOC=Color3.fromRGB(0,255,100) L.PCOC=Color3.fromRGB(255,100,0) L.Friendlies={} L.Priorities={} L.SKE=false L.SKC=Color3.fromRGB(255,255,255)
+L.CCM_E=false L.CCM_C=Color3.new(1,1,1) L.CCM_M="ForceField" L.CCM_A="None" L.CCM_T=0.5
+L.SK_N = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"}
+L.SK_C = {{1, 2}, {2, 3}, {2, 4}, {2, 5}, {2, 6}}
 L.KM = {
 "Roxy just frame mogged %s",
 "Roxy gave %s high cortisol",
@@ -390,10 +392,12 @@ L.HOD[m]=o L.HD[m]=ss L.HTD[m]=t
 end
 local function aHE(m) if not m:IsA("Model")or (not not m and m.Name == LP.Name)then return end pC(m)cD(m)cW(m)cA(m)cN(m)cB1(m)cH(m) end
 local function rHE(m)
-local function rm(d)if d then d:Remove()end end rm(L.DD[m])L.DD[m]=nil rm(L.WD[m])L.WD[m]=nil rm(L.AD[m])L.AD[m]=nil
-rm(L.ND[m])L.ND[m]=nil rm(L.BD[m])L.BD[m]=nil rm(L.BOD[m])L.BOD[m]=nil rm(L.BFD[m])L.BFD[m]=nil
-if L.HD[m]then for _,b in ipairs(L.HD[m])do b:Remove()end L.HD[m]=nil end rm(L.HOD[m])L.HOD[m]=nil rm(L.HTD[m])L.HTD[m]=nil
-cC(m) if L.CH[m]then for _,c in ipairs(L.CH[m])do c:Disconnect()end L.CH[m]=nil end L.VH[m]=nil L.FC[m]=nil L.HTFC[m]=nil
+    local function rm(d)if d then d:Remove()end end rm(L.DD[m])L.DD[m]=nil rm(L.WD[m])L.WD[m]=nil rm(L.AD[m])L.AD[m]=nil
+    rm(L.ND[m])L.ND[m]=nil rm(L.BD[m])L.BD[m]=nil rm(L.BOD[m])L.BOD[m]=nil rm(L.BFD[m])L.BFD[m]=nil
+    if L.SKD[m]then for _,l in ipairs(L.SKD[m])do l:Remove()end L.SKD[m]=nil end
+    if L.HD[m]then for _,b in ipairs(L.HD[m])do b:Remove()end L.HD[m]=nil end rm(L.HOD[m])L.HOD[m]=nil rm(L.HTD[m])L.HTD[m]=nil
+    cC(m) if L.CH[m]then for _,c in ipairs(L.CH[m])do c:Disconnect()end L.CH[m]=nil end L.VH[m]=nil L.FC[m]=nil L.HTFC[m]=nil
+    if L.Cache and L.Cache.ESP then L.Cache.ESP[m] = nil end
 end
 local function cI(p)if L.ID[p]then return end local d=Drawing.new("Text")d.Center=true d.Outline=true d.Size=13 if table.find(SF,L.IFont or L.Font)then d.Font=(L.IFont or L.Font)end d.Visible=false L.ID[p]=d end
 local function rI(p)if L.ID[p]then L.ID[p]:Remove()L.ID[p]=nil end L.IFC[p]=nil end
@@ -508,12 +512,12 @@ local function cProp(d,k,v) if d[k]~=v then d[k]=v end end
 local function cPropV2(d,k,x,y) local c=d[k] if c.X~=x or c.Y~=y then d[k]=Vector2.new(x,y) end end
 local function c2r(c)
     if not c then return "Common" end
-    local m={{c=Color3.fromRGB(128,128,128),n="Common"},{c=Color3.fromRGB(0,177,0),n="Uncommon"},{c=Color3.fromRGB(0,166,255),n="Rare"},{c=Color3.fromRGB(222,37,255),n="Epic"},{c=Color3.fromRGB(252,255,49),n="Legendary"},{c=Color3.fromRGB(255,0,0),n="Mythic"},{c=Color3.fromRGB(255,255,255),n="Divine"}}
+    local m={{c=Color3.fromRGB(128,128,128),n="Common"},{c=Color3.fromRGB(0,177,0),n="Uncommon"},{c=Color3.fromRGB(0,166,255),n="Rare"},{c=Color3.fromRGB(222,37,255),n="Epic"},{c=Color3.fromRGB(252,255,49),n="Legendary"},{c=Color3.fromRGB(255,0,0),n="Mythic"},{c=Color3.fromRGB(255,255,255),n="Divine"},{c=Color3.fromRGB(13,231,184),n="Translucent"}}
     local bD,bN=10,"Common"
     for _,v in ipairs(m)do local d=(Vector3.new(c.R,c.G,c.B)-Vector3.new(v.c.R,v.c.G,v.c.B)).Magnitude if d<bD then bD,bN=d,v.n end end
     return bN
 end
-local rCls={Common=Color3.fromRGB(128,128,128),Uncommon=Color3.fromRGB(0,177,0),Rare=Color3.fromRGB(0,166,255),Epic=Color3.fromRGB(222,37,255),Legendary=Color3.fromRGB(252,255,49),Mythic=Color3.fromRGB(255,0,0),Divine=Color3.fromRGB(255,255,255)}
+local rCls={Common=Color3.fromRGB(128,128,128),Uncommon=Color3.fromRGB(0,177,0),Rare=Color3.fromRGB(0,166,255),Epic=Color3.fromRGB(222,37,255),Legendary=Color3.fromRGB(252,255,49),Mythic=Color3.fromRGB(255,0,0),Divine=Color3.fromRGB(255,255,255),Translucent=Color3.fromRGB(13,231,184)}
 RS.Heartbeat:Connect(function()
     local cP=C.CFrame.Position local mD=L.DMax local n=os.clock()
     for _,m in ipairs(EF:GetChildren())do if m.Name==LP.Name then continue end
@@ -574,10 +578,34 @@ RS.Heartbeat:Connect(function()
         local fpr=C:FindFirstChild("FirstPersonRig") or WS:FindFirstChild("FirstPersonRig") if fpr then for _,v in ipairs(fpr:GetChildren())do if v:IsA("Model")then mc=mc+1 mods[mc]=v end end end
         if mc>0 then local parts={} for i=1,mc do for _,p in ipairs(mods[i]:GetDescendants())do if p:IsA("BasePart")then table.insert(parts,p) end end end gunPartCache=parts else gunPartCache={} end
     end
-    if n-L.State.lastXtCheck>2 then
-        L.State.lastXtCheck=n local pts,int={},workspace:FindFirstChild("Interactible")
-        if int then for _,v in ipairs(int:GetChildren())do if v.Name:find("Extraction Point")then table.insert(pts,v)end end end
-        L.State.xtPoints=pts
+    if L.CCM_E and n-L.State.lastCharCheck>0.5 then
+        L.State.lastCharCheck=n local lpE=EF and EF:FindFirstChild(LP.Name) or LP.Character
+        local em=lpE and lpE:FindFirstChild("EquipModels")
+        local cCur, aCur = lpE and #lpE:GetChildren() or 0, em and #em:GetChildren() or 0
+        if cCur ~= L.State.charChildCount or aCur ~= L.State.armorChildCount then
+            L.State.charChildCount, L.State.armorChildCount = cCur, aCur
+            local mods,mc={},0
+            if lpE then 
+                for _,v in ipairs(lpE:GetChildren())do if (v:IsA("BasePart") or v:IsA("Model")) and v.Name ~= "WeaponContainer" and v.Name ~= "EquipModels" then mc=mc+1 mods[mc]=v end end
+                if em then for _,v in ipairs(em:GetChildren())do if (v:IsA("Model") or v:IsA("BasePart")) and v.Name ~= "Primary" and v.Name ~= "Secondary" then mc=mc+1 mods[mc]=v end end end
+            end
+            if mc>0 then 
+                local pts={} 
+                for i=1,mc do 
+                    local m=mods[i]
+                    local pList = m:IsA("BasePart") and {m} or m:GetDescendants()
+                    for _,p in ipairs(pList) do
+                        if p:IsA("BasePart") then
+                            local entry = {p=p, sa=p:FindFirstChildOfClass("SurfaceAppearance"), mesh=p:FindFirstChildOfClass("SpecialMesh"), dls={}}
+                            for _,d in ipairs(p:GetChildren()) do if d:IsA("Decal") or d:IsA("Texture") then table.insert(entry.dls, d) end end
+                            table.insert(pts, entry)
+                        end
+                    end
+                end 
+                charPartCache=pts 
+            else charPartCache={} end
+            L.State.ccmHash = "" -- Force re-apply on structural change
+        end
     end
     if L.XEE then
         local mX=L.XED or 2500
@@ -587,12 +615,18 @@ RS.Heartbeat:Connect(function()
         end
     end
     if L.SA_E and n-tc_last>0.1 then tc_last=n local a,b=gCTM() L.SA_T=a L.SA_TP=b end
+    if n-L.State.lastXtCheck>2 then
+        L.State.lastXtCheck=n local pts,int={},workspace:FindFirstChild("Interactible")
+        if int then for _,v in ipairs(int:GetChildren())do if v.Name:find("Extraction Point")then table.insert(pts,v)end end end
+        L.State.xtPoints=pts
+    end
 end)
 local function hAll(m)
     local tN=L.ND[m] local tWp=L.WD[m] local tAu=L.AD[m] local tD=L.DD[m] local bx=L.BD[m] local ou=L.BOD[m] local fl=L.BFD[m] local hB=L.HD[m] local hO=L.HOD[m] local hT=L.HTD[m] local aC=L.AC[m]
     if tN then cProp(tN,"Visible",false) end if tWp then cProp(tWp,"Visible",false) end if tAu then cProp(tAu,"Visible",false) end if tD then cProp(tD,"Visible",false) end if bx then cProp(bx,"Visible",false) end if ou then cProp(ou,"Visible",false) end if fl then cProp(fl,"Visible",false) end if hO then cProp(hO,"Visible",false) end if hT then cProp(hT,"Visible",false) L.HTFC[m]=nil end
     if hB then for i=1,40 do if hB[i]then cProp(hB[i],"Visible",false) end end end
     if aC then for i=1,#aC do local b=aC[i]if b:IsA("Highlight")then if b.Enabled then b.Enabled=false b.FillTransparency=1 b.OutlineTransparency=1 end elseif b.Visible then b.Visible=false b.Transparency=1 end end end
+    if L.SKD[m]then for _,l in ipairs(L.SKD[m])do l.Visible=false end end
     L.FC[m]=nil
 end
 local v3_T=Vector3.new(0,3,0) local v3_B=Vector3.new(0,3.5,0)
@@ -603,7 +637,7 @@ local function onRenderSteppedESP(dt)
     local n=os.clock()
     local dE,wE,aE,nE,bE,hE,cE=L.DE,L.WE,L.AE,L.NE,L.BE,L.HE,L.CE and not L.HBE_E
     local iGe=L.IGE local iDe=L.IDE local iMD=L.IDMax or 5000
-    if not(dE or wE or aE or nE or bE or hE or cE or iGe or iDe or L.XEE or L.CE_E)then
+    if not(dE or wE or aE or nE or bE or hE or cE or iGe or iDe or L.XEE or L.CE_E or L.LGM_E or L.CCM_E)then
         if ESP_V then
             for m,_ in pairs(L.DD)do hAll(m) end
             for _,t in pairs(L.ID)do cProp(t,"Visible",false) end
@@ -613,35 +647,38 @@ local function onRenderSteppedESP(dt)
         end
         return
     end
-    ESP_V=true
-    for m,cA in pairs(espCache)do
+    ESP_V=true for m,cA in pairs(espCache)do
         local sS,d=cA.sS,cA.d or 0
         local fA=cA.fA or 0 if sS then fA=math.min(fA+dt/(L.FIn or 0.15),1)else fA=math.max(fA-dt/(L.FOut or 0.15),0)end cA.fA=fA
         if fA<=0 then hAll(m)continue end
+        local tF=(L.SA_HT and L.SA_E) and (L.State.TF[m] or 0) or 0
+        if L.SA_T == m then tF=math.min(tF+dt*5, 1) else tF=math.max(tF-dt*5, 0) end L.State.TF[m]=tF
+        local hC=L.SA_HTC or Color3.new(1,0,0)
+        local function lC(b) return tF>0 and b:Lerp(hC, tF) or b end
         local to=cA.to if sS and to and to.Parent then cA.lastW=to.Position else sS=false end
         local tP,bP,tV,bV if cA.lastW then local tW=cA.lastW+v3_T local bW=cA.lastW-v3_B tP,tV=C:WorldToViewportPoint(tW) bP,bV=C:WorldToViewportPoint(bW) end
         local tN=L.ND[m]local tWp=L.WD[m]local tAu=L.AD[m]local tD=L.DD[m]local bx=L.BD[m]local ou=L.BOD[m]local fl=L.BFD[m]local hB=L.HD[m]local hO=L.HOD[m]local hT=L.HTD[m]local aC=L.AC[m]
         if not tP or not tV or not bV then hAll(m)continue end
         local h=math.floor(math.abs(tP.Y-bP.Y))local w=math.floor(h*0.55)local x=math.floor(tP.X-w/2)local y=math.floor(tP.Y)
-        if tN then if nE then cPropV2(tN,"Position",x+w/2,y-15) cProp(tN,"Text",aFC(m.Name)) cProp(tN,"Color",L.NTC) cProp(tN,"Transparency",fA) cProp(tN,"Visible",true) else cProp(tN,"Visible",false) end end
-        if tWp then if wE then cPropV2(tWp,"Position",x+w/2,y+h) cProp(tWp,"Text",aFC(cA.wN or"None")) cProp(tWp,"Color",L.WTC) cProp(tWp,"Transparency",fA) cProp(tWp,"Visible",true) else cProp(tWp,"Visible",false) end end
-        if tAu then if aE then cPropV2(tAu,"Position",x+w+2,y-4) cProp(tAu,"Text",aFC(cA.aT or"None")) cProp(tAu,"Color",L.ATC) cProp(tAu,"Transparency",fA) cProp(tAu,"Visible",true) else cProp(tAu,"Visible",false) end end
-        if tD then if dE then cPropV2(tD,"Position",x+w/2,y+h+(wE and 13 or 0)) cProp(tD,"Text",math.floor(d).."s") cProp(tD,"Color",L.DTC) cProp(tD,"Transparency",fA) cProp(tD,"Visible",true) else cProp(tD,"Visible",false) end end
-        if bx and ou then if bE then cProp(bx,"Visible",true) cProp(ou,"Visible",true) cProp(bx,"Color",L.BC) cProp(ou,"Color",Color3.new(0,0,0)) cProp(bx,"Transparency",fA) cProp(ou,"Transparency",fA) cPropV2(bx,"Size",w,h) cPropV2(bx,"Position",x,y) cPropV2(ou,"Size",w,h) cPropV2(ou,"Position",x,y) if fl then if L.BFE then cProp(fl,"Visible",true) cProp(fl,"Color",L.BFC) local tTrans=Options and Options["BoxFillColorPicker"]and Options["BoxFillColorPicker"].Transparency or 0.5 cProp(fl,"Transparency",(1-tTrans)*fA) cPropV2(fl,"Size",w,h) cPropV2(fl,"Position",x,y) else cProp(fl,"Visible",false) end end else cProp(bx,"Visible",false) cProp(ou,"Visible",false) if fl then cProp(fl,"Visible",false) end end end
+        if tN then if nE then cPropV2(tN,"Position",x+w/2,y-15) cProp(tN,"Text",aFC(m.Name)) cProp(tN,"Color",lC(L.NTC)) cProp(tN,"Transparency",fA) cProp(tN,"Visible",true) else cProp(tN,"Visible",false) end end
+        if tWp then if wE then cPropV2(tWp,"Position",x+w/2,y+h) cProp(tWp,"Text",aFC(cA.wN or"None")) cProp(tWp,"Color",lC(L.WTC)) cProp(tWp,"Transparency",fA) cProp(tWp,"Visible",true) else cProp(tWp,"Visible",false) end end
+        if tAu then if aE then cPropV2(tAu,"Position",x+w+2,y-4) cProp(tAu,"Text",aFC(cA.aT or"None")) cProp(tAu,"Color",lC(L.ATC)) cProp(tAu,"Transparency",fA) cProp(tAu,"Visible",true) else cProp(tAu,"Visible",false) end end
+        if tD then if dE then cPropV2(tD,"Position",x+w/2,y+h+(wE and 13 or 0)) cProp(tD,"Text",math.floor(d).."s") cProp(tD,"Color",lC(L.DTC)) cProp(tD,"Transparency",fA) cProp(tD,"Visible",true) else cProp(tD,"Visible",false) end end
+        if bx and ou then if bE then cProp(bx,"Visible",true) cProp(ou,"Visible",true) cProp(bx,"Color",lC(L.BC)) cProp(ou,"Color",Color3.new(0,0,0)) cProp(bx,"Transparency",fA) cProp(ou,"Transparency",fA) cPropV2(bx,"Size",w,h) cPropV2(bx,"Position",x,y) cPropV2(ou,"Size",w,h) cPropV2(ou,"Position",x,y) if fl then if L.BFE then cProp(fl,"Visible",true) cProp(fl,"Color",lC(L.BFC)) local tTrans=Options and Options["BoxFillColorPicker"]and Options["BoxFillColorPicker"].Transparency or 0.5 cProp(fl,"Transparency",(1-tTrans)*fA) cPropV2(fl,"Size",w,h) cPropV2(fl,"Position",x,y) else cProp(fl,"Visible",false) end end else cProp(bx,"Visible",false) cProp(ou,"Visible",false) if fl then cProp(fl,"Visible",false) end end end
         local hHigh, hLow = L.HHC, L.HLC
         if (L.PE and L.Priorities[m.Name]) or (L.FE and L.Friendlies[m.Name]) then
             hHigh, hLow = Color3.fromRGB(0, 255, 0), Color3.fromRGB(255, 0, 0)
         end
-
+        if tF>0 then hHigh,hLow=hHigh:Lerp(hC,tF),hLow:Lerp(hC,tF)end
         if hB and hO then if hE then local hs=cA.hs or 0 local vs=L.VH[m]or hs vs=vs+(hs-vs)*math.clamp(dt*10,0,1)L.VH[m]=vs local bX=math.floor(x-5)local bY=math.floor(y) cPropV2(hO,"Size",4,math.floor(h)+2) cPropV2(hO,"Position",bX-1,bY-1) cProp(hO,"Transparency",fA) cProp(hO,"Visible",true)
         if L.HGE then local sC=40 local sH=h/sC local tF=h*vs for i=1,sC do local sg=hB[i]if sg then local sP=(i-1)/(sC-1)if L.HGR then sP=(math.sin(i/7.5+tick()*(L.HGRS or 4))+1)/2 end local sb=(i-1)*sH if sb<tF then local sf=math.min(sH,tF-sb)local stP=math.floor(bY+h-sb-sf)local sbP=math.floor(bY+h-sb) cPropV2(sg,"Size",2,sbP-stP) cPropV2(sg,"Position",bX,stP) cProp(sg,"Color",hLow:Lerp(hHigh,sP)) cProp(sg,"Transparency",fA) cProp(sg,"Visible",true) else cProp(sg,"Visible",false) end end end else local bh=math.ceil(h*vs)local byP=math.floor(bY+(h-bh)) if hB[1]then cPropV2(hB[1],"Size",2,bh) cPropV2(hB[1],"Position",bX,byP) cProp(hB[1],"Color",hLow:Lerp(hHigh,vs)) cProp(hB[1],"Transparency",fA) cProp(hB[1],"Visible",true) end for i=2,40 do if hB[i]then cProp(hB[i],"Visible",false) end end end
-        if hT then local fP=L.HTFC[m]or 0 if L.HTE and hs<1 then fP=math.min(fP+(dt/(L.FIn or 0.15)),1)else fP=math.max(fP-(dt/(L.FOut or 0.15)),0)end L.HTFC[m]=fP if fP>0 then local tY=bY+h-(h*vs) cProp(hT,"Text",tostring(math.floor(hs*100))) cPropV2(hT,"Position",x+w+7,tY-8) cProp(hT,"Color",L.HTC) cProp(hT,"Transparency",fP*fA) cProp(hT,"Visible",true) else cProp(hT,"Visible",false) end end
+        if hT then local fP=L.HTFC[m]or 0 if L.HTE and hs<1 then fP=math.min(fP+(dt/(L.FIn or 0.15)),1)else fP=math.max(fP-(dt/(L.FOut or 0.15)),0)end L.HTFC[m]=fP if fP>0 then local tY=bY+h-(h*vs) cProp(hT,"Text",tostring(math.floor(hs*100))) cPropV2(hT,"Position",x-18,tY-8) cProp(hT,"Color",lC(L.HTC)) cProp(hT,"Transparency",fP*fA) cProp(hT,"Visible",true) else cProp(hT,"Visible",false) end end
         else cProp(hO,"Visible",false) for i=1,40 do if hB[i]then cProp(hB[i],"Visible",false) end end if hT then cProp(hT,"Visible",false) end end end
         
         local oC = nil
         if L.PE and L.Priorities[m.Name] then oC = L.PCOC
         elseif L.FE and L.Friendlies[m.Name] then oC = L.FCOC end
-        if oC then
+        if oC and tF<=0 then
             if tN then tN.Color = oC end
             if tWp then tWp.Color = oC end
             if tAu then tAu.Color = oC end
@@ -650,12 +687,64 @@ local function onRenderSteppedESP(dt)
             if hT then hT.Color = oC end
         end
 
-        if aC then if cE then if n-(cA.lt or 0)>0.2 then cA.lt=n local cbT=L.CTrans or 0.5 local cfA=1-(fA*(1-cbT)) for i=1,#aC do local b=aC[i]if b:IsA("Highlight")then b.FillTransparency=cfA b.OutlineTransparency=cfA b.Enabled=true b.FillColor = oC or L.CC b.OutlineColor = oC or L.CC else b.Transparency=cfA b.Visible=true b.Color3 = oC or L.CC end end end else if not cA.hOf then cA.hOf=true for i=1,#aC do local b=aC[i]if b:IsA("Highlight")then b.Enabled=false b.FillTransparency=1 b.OutlineTransparency=1 else b.Visible=false b.Transparency=1 end end end end else cA.hOf=false end
+        if aC then if cE then if n-(cA.lt or 0)>0.2 or tF>0 then cA.lt=n local cbT=L.CTrans or 0.5 local cfA=1-(fA*(1-cbT)) local curC=lC(oC or L.CC) for i=1,#aC do local b=aC[i]if b:IsA("Highlight")then b.FillTransparency=cfA b.OutlineTransparency=cfA b.Enabled=true b.FillColor = curC b.OutlineColor = curC else b.Transparency=cfA b.Visible=true b.Color3 = curC end end end else if not cA.hOf then cA.hOf=true for i=1,#aC do local b=aC[i]if b:IsA("Highlight")then b.Enabled=false b.FillTransparency=1 b.OutlineTransparency=1 else b.Visible=false b.Transparency=1 end end end end else cA.hOf=false end
+
+        if L.SKE and fA > 0 then
+            local lines = L.SKD[m]
+            if not lines then
+                lines = {}
+                for i=1,10 do
+                    local l = Drawing.new("Line")
+                    l.Visible = false
+                    l.Thickness = (i <= 5 and 2.5 or 1)
+                    l.ZIndex = (i <= 5 and 1 or 2)
+                    l.Color = (i <= 5 and Color3.new(0,0,0) or lC(oC or L.SKC))
+                    lines[i] = l
+                end
+                L.SKD[m] = lines
+            end
+            if not cA.bones then
+                local b = {}
+                for i=1,6 do b[i] = m:FindFirstChild(L.SK_N[i]) end
+                cA.bones = b
+            end
+            local b = cA.bones
+            if b[1] and b[1].Parent then
+                local pts = cA.skpts or {}
+                local allV = true
+                for i=1,6 do
+                    local p, o = C:WorldToViewportPoint(b[i].Position)
+                    if o then pts[i] = Vector2.new(p.X, p.Y) else allV = false break end
+                end
+                cA.skpts = pts
+                if allV then
+                    local sCl=lC(oC or L.SKC)
+                    for i=1,5 do
+                        local ol, l = lines[i], lines[i+5]
+                        local con = L.SK_C[i]
+                        local p1, p2 = pts[con[1]], pts[con[2]]
+                        ol.From, l.From = p1, p1
+                        ol.To, l.To = p2, p2
+                        l.Color = sCl
+                        ol.Transparency, l.Transparency = fA, fA
+                        ol.Visible, l.Visible = true, true
+                    end
+                else
+                    for i=1,10 do lines[i].Visible = false end
+                end
+            else
+                cA.bones = nil
+                for i=1,10 do lines[i].Visible = false end
+            end
+        elseif L.SKD[m] then
+            for i=1,10 do L.SKD[m][i].Visible = false end
+        end
     end
     for p,t in pairs(L.ID)do
         local cA=itemCache[p] local sS=cA and cA.sS local tP,tV if sS then tP,tV=C:WorldToViewportPoint(p.Position) if not tV then sS=false end else sS=false end
         local fP=L.IFC[p]or 0 if sS then fP=math.min(fP+(dt/(L.FIn or 0.15)),1)else fP=math.max(fP-(dt/(L.FOut or 0.15)),0)end L.IFC[p]=fP
-        if fP>0 and tV then if L.IS and not L.IS[cA.rar]then cProp(t,"Visible",false)continue end
+        if fP>0 and tV then 
+            if L.IS and not L.IS[cA.rar] then cProp(t,"Visible",false)continue end
             cPropV2(t,"Position",tP.X,tP.Y) cProp(t,"Text","[ "..aFC(cA.md.Name).." ]") cProp(t,"Color",cA.rC) cProp(t,"Transparency",fP) cProp(t,"Visible",true)
         else cProp(t,"Visible",false) end
     end
@@ -702,6 +791,44 @@ local function onRenderSteppedESP(dt)
             if p.Material~=mt then p.Material=mt end if p.Color~=cl then p.Color=cl end if p.Transparency~=tr then p.Transparency=tr end
         end end
     elseif next(wOrig)then for p,v in pairs(wOrig)do if p.Parent then p.Material=v.M p.Color=v.C p.Transparency=v.T if v.SA then v.SA.Parent=p end end end wOrig=setmetatable({},{__mode="k"}) end
+    
+    if L.CCM_E and #charPartCache>0 then
+        local mtS, clS, trS, an, t = L.CCM_M or "ForceField", L.CCM_C or Color3.new(1,1,1), L.CCM_T or 0.5, L.CCM_A or "None", os.clock()
+        local hash = mtS..tostring(clS)..tostring(trS)..an
+        if an == "None" and L.State.ccmHash == hash then else
+            L.State.ccmHash = hash
+            local mt, cl, tr = Enum.Material[mtS] or Enum.Material.ForceField, clS, trS
+            if an=="Rainbow"then cl=Color3.fromHSV((t%2)/2,1,1)elseif an=="Pulse"then cl=cl:Lerp(Color3.new(0,0,0),(math.sin(t*3)+1)/2)elseif an=="Fade"then tr=tr+(1-tr)*((math.sin(t*3)+1)/2)end
+            for _,e in ipairs(charPartCache) do 
+                local p = e.p
+                if p.Parent then
+                    local og=L.State.CHOC[p] if not og then 
+                        if p.Transparency>=1 then continue end 
+                        og={M=p.Material,C=p.Color,T=p.Transparency} L.State.CHOC[p]=og 
+                        if e.sa then og.SA=e.sa e.sa.Parent=nil end
+                        if p:IsA("MeshPart") and p.TextureID~="" then og.TxID=p.TextureID p.TextureID="" end
+                        if e.mesh and e.mesh.TextureId~="" then og.MTxID=e.mesh.TextureId e.mesh.TextureId="" end
+                        local dls={} for _,d in ipairs(e.dls) do if d.Transparency<1 then table.insert(dls, {i=d, t=d.Transparency}) d.Transparency=1 end end og.Dls=dls
+                    end
+                    if p.Material~=mt then p.Material=mt end if p.Color~=cl then p.Color=cl end 
+                    local curTr = (p.Name == "Head" and math.max(tr, 0.8) or tr)
+                    if p.Transparency~=curTr then p.Transparency=curTr end
+                end 
+            end
+        end
+    elseif next(L.State.CHOC) then 
+        L.State.ccmHash = ""
+        for p,v in pairs(L.State.CHOC) do 
+            if p.Parent then 
+                p.Material=v.M p.Color=v.C p.Transparency=v.T 
+                if v.SA then v.SA.Parent=p end 
+                if v.TxID then p.TextureID=v.TxID end
+                if v.MTxID then local m=p:FindFirstChildOfClass("SpecialMesh") if m then m.TextureId=v.MTxID end end
+                if v.Dls then for _,d in ipairs(v.Dls) do d.i.Transparency=d.t end end
+            end 
+        end 
+        L.State.CHOC=setmetatable({},{__mode="k"}) 
+    end
 end
 do
 local E1Box=Tabs.B:AddLeftTabbox() local E1=E1Box:AddTab('Player ESP') local ET=E1Box:AddTab('Extra')
@@ -729,11 +856,13 @@ HDB3:AddSlider("HealthGradientRotationSpeed",{Text="Gradient Rotation Speed",Def
 HDB3:SetupDependencies({{HGRT,true}})
 local CE2=E1:AddToggle('DistanceESP',{Text='Player Distance',Default=false,Callback=function(v)L.DE=v end})
 CE2:AddColorPicker("DistanceESPCP",{Default=L.DTC,Title="Text Color",Callback=function(v)L.DTC=v end})
-E1:AddSlider('PDistMax',{Text='Max ESP Distance',Default=2000,Min=0,Max=10000,Rounding=0,Compact=true,Callback=function(v)L.DMax=v end})
 local CE3=E1:AddToggle('WeaponESP',{Text='Player Weapon',Default=false,Callback=function(v)L.WE=v end})
 CE3:AddColorPicker("WeaponESPCP",{Default=L.WTC,Title="Text Color",Callback=function(v)L.WTC=v end})
+local SET = E1:AddToggle('SkeletonESP',{Text='Player Skeleton',Default=false,Callback=function(v)L.SKE=v end})
+SET:AddColorPicker("SkeletonESPCP",{Default=L.SKC,Title="Skeleton Color",Callback=function(v)L.SKC=v end})
 local CE4=E1:AddToggle('AuraESP',{Text='Player Aura',Default=false,Callback=function(v)L.AE=v end})
 CE4:AddColorPicker("AuraESPCP",{Default=Color3.new(1,1,1),Title="Text Color",Callback=function(v)L.ATC=v end})
+E1:AddSlider('PDistMax',{Text='Max Distance',Default=2000,Min=0,Max=10000,Rounding=0,Compact=true,Callback=function(v)L.DMax=v end})
 E1:AddDropdown('FontTypeDropdown',{Values={'UI','System','Plex','Monospace'},Default=3,Multi=false,Text='Font Type',Callback=function(v)local f=FM[v]if f~=nil then uAF(f)end end})
 E1:AddDropdown('FontCaseDropdown',{Values={'Normal','Lowercase','Uppercase'},Default=1,Multi=false,Text='Font Case',Callback=function(v)L.FCase=v end})
 ET:AddToggle('ArenaOnly',{Text='Only Show Players In Arena',Default=false,Callback=function(v)L.ArenaOnly=v end})
@@ -756,13 +885,13 @@ C_TAB:AddToggle('CrateRarityColor', {Text='Rarity Colors', Default=false, Callba
 C_TAB:AddSlider('CrateDistance', {Text='Max Distance', Default=5000, Min=0, Max=10000, Rounding=0, Compact=true, Callback=function(v) L.CDMax=v end})
 C_TAB:AddDropdown('CrateSort', {Values={'Common','Uncommon','Rare','Epic','Legendary','Mythic','Divine'}, Default={'Common','Uncommon','Rare','Epic','Legendary','Mythic','Divine'}, Multi=true, Text='Item Sort', Callback=function(v) L.CSort=v end})
 C_TAB:AddDropdown('CrateFontType', {Values={'UI','System','Plex','Monospace'}, Default=3, Multi=false, Text='Font Type', Callback=function(v) local f=FM[v] if f~=nil then L.CFont=f for _,d in pairs(L.CD) do d.Font=f end end end})
-local IE2=I1:AddToggle('ItemGuns',{Text='Dropped Guns',Default=false,Callback=function(v)L.IGE=v end})
-IE2:AddColorPicker("ItemGunsCP",{Default=Color3.new(1,1,1),Title="Guns Color",Callback=function(v)L.IGC=v end})
+local IE2=I1:AddToggle('ItemGuns',{Text='Dropped Weapons',Default=false,Callback=function(v)L.IGE=v end})
+IE2:AddColorPicker("ItemGunsCP",{Default=Color3.new(1,1,1),Title="Weapons Color",Callback=function(v)L.IGC=v end})
 local IE3=I1:AddToggle('ItemGear',{Text='Dropped Gear',Default=false,Callback=function(v)L.IDE=v end})
 IE3:AddColorPicker("ItemGearCP",{Default=Color3.new(1,1,1),Title="Gear Color",Callback=function(v)L.IDC=v end})
 I1:AddToggle('ItemRarityColor',{Text='Rarity Colors',Default=false,Callback=function(v)L.IRC=v end})
 I1:AddSlider('ItemDistance',{Text='Max Distance',Default=5000,Min=0,Max=10000,Rounding=0,Compact=true,Callback=function(v)L.IDMax=v end})
-I1:AddDropdown('ItemSort',{Values={'Common','Uncommon','Rare','Epic','Legendary','Mythic','Divine'},Default={'Common','Uncommon','Rare','Epic','Legendary','Mythic','Divine'},Multi=true,Text='Item Sort',Callback=function(v)L.IS=v end})
+I1:AddDropdown('ItemSort',{Values={'Common','Uncommon','Rare','Epic','Legendary','Mythic','Divine','Translucent'},Default={'Common','Uncommon','Rare','Epic','Legendary','Mythic','Divine','Translucent'},Multi=true,Text='Item Sort',Callback=function(v)L.IS=v end})
 I1:AddDropdown('ItemFontType',{Values={'UI','System','Plex','Monospace'},Default=3,Multi=false,Text='Font Type',Callback=function(v)local f=FM[v]if f~=nil then L.IFont=f for _,d in pairs(L.ID)do d.Font=f end end end})
 local XT_T = X_TAB:AddToggle('ExtractionsToggle',{Text='Extraction Points',Default=false,Callback=function(v)L.XEE=v end})
 XT_T:AddColorPicker("ExtractionCP",{Default=L.XEC,Title="Extraction Color",Callback=function(v)L.XEC=v end})
@@ -795,6 +924,10 @@ local LG=LL:AddToggle("CustomGunMat",{Text="Custom Gun Material",Default=false,C
 LG:AddColorPicker("CustomGunCP",{Default=Color3.new(1,1,1),Title="Material Color",Transparency=0.5,Callback=function(v)L.LGM_C=v L.LGM_T=(Options and Options["CustomGunCP"] and Options["CustomGunCP"].Transparency or 0.5)end})
 LL:AddDropdown("CustomGunMatList",{Values={"ForceField","Neon","Plastic","SmoothPlastic","Glass","Foil","Wood","Slate"},Default=1,Multi=false,Text="Material List",Callback=function(v)L.LGM_M=v end})
 LL:AddDropdown("CustomGunFFAnim",{Values={"None","Rainbow","Pulse","Fade"},Default=1,Multi=false,Text="Forcefield Animation",Callback=function(v)L.LGM_A=v end})
+local LCM=LL:AddToggle("CustomCharMat",{Text="Custom Character Material",Default=false,Callback=function(v)L.CCM_E=v end})
+LCM:AddColorPicker("CustomCharCP",{Default=Color3.new(1,1,1),Title="Material Color",Transparency=0.5,Callback=function(v)L.CCM_C=v L.CCM_T=(Options and Options["CustomCharCP"]and Options["CustomCharCP"].Transparency or 0.5)end})
+LL:AddDropdown("CustomCharMatList",{Values={"ForceField","Neon","Plastic","SmoothPlastic","Glass","Foil","Wood","Slate"},Default=1,Multi=false,Text="Material List",Callback=function(v)L.CCM_M=v end})
+LL:AddDropdown("CustomCharFFAnim",{Values={"None","Rainbow","Pulse","Fade"},Default=1,Multi=false,Text="Forcefield Animation",Callback=function(v)L.CCM_A=v end})
 local CT = Tabs.B:AddRightGroupbox("Crosshair")
 local CXH=CT:AddToggle("CrosshairEnabled",{Text="Toggle Crosshair",Default=false,Callback=function(v)L.XHE=v end})
 CXH:AddColorPicker("CrosshairColor",{Default=L.XHC,Title="Crosshair Color",Callback=function(v)L.XHC=v end})
@@ -868,6 +1001,7 @@ M1_Combat:AddToggle('CWS',{Text='Custom Walkspeed',Default=false,Callback=functi
 M1_Combat:AddToggle('CJP',{Text='Custom JumpPower',Default=false,Callback=function(v)L.CJP=v L.CJPTime=os.clock()local c=LP.Character local h=c and c:FindFirstChildOfClass("Humanoid")if v then L.CJPStart=h and h.JumpPower or 50 end end}):AddKeyPicker('CJPKey',{Default='None',SyncToggleState=true,Mode='Toggle',Text='Custom JumpPower',NoUI=false})
 M1_Combat:AddToggle('Noclip',{Text='Noclip',Default=false,Callback=function(v)L.Noclip=v end}):AddKeyPicker('NoclipKey',{Default='None',SyncToggleState=true,Mode='Toggle',Text='Noclip',NoUI=false})
 M1_Combat:AddToggle('FlyE',{Text='Fly',Default=false,Callback=function(v)L.FlyE=v end}):AddKeyPicker('FlyKey',{Default='None',SyncToggleState=true,Mode='Toggle',Text='Fly',NoUI=false})
+M1_Combat:AddToggle('NJC', {Text='No Jump Cooldown', Default=false, Callback=function(v) L.NJC=v end})
 M1_Combat:AddSlider('FlySpeed',{Text='Fly Speed',Default=20,Min=0,Max=34,Rounding=1,Compact=true,Callback=function(v)L.FlyS=v end})
 M1_Combat:AddSlider('CWSAmount',{Text='Walkspeed Amount',Default=25,Min=16,Max=33,Rounding=0,Compact=true,Callback=function(v)L.CWSA=v end})
 M1_Combat:AddSlider('CJPAmount',{Text='JumpPower Amount',Default=50,Min=50,Max=225,Rounding=0,Compact=true,Callback=function(v)L.CJPA=v end})
@@ -882,7 +1016,8 @@ SA_G:AddDropdown('SA_P', {Values={'Head','Torso'}, Default=1, Multi=false, Text=
 SA_G:AddDivider()
 SA_G:AddToggle('SA_SF', {Text='FOV Visible', Default=false, Callback=function(v) L.SA_SF=v end}):AddColorPicker('SA_FC', {Default=L.SA_FC or Color3.new(1,1,1), Title='FOV Color', Callback=function(v) L.SA_FC=v end})
 SA_G:AddToggle('SA_SE', {Text='Snapline', Default=false, Callback=function(v) L.SA_SE=v end}):AddColorPicker('SA_SC', {Default=Color3.new(1,1,1), Title='Snapline Color', Callback=function(v) L.SA_SC=v end})
-SA_G:AddToggle('SA_FT', {Text='Follow Target', Default=false, Callback=function(v) L.SA_FT=v end})
+SA_G:AddToggle('SA_FT', {Text='Follow Target', Tooltip='Makes the FOV follow current target', Default=false, Callback=function(v) L.SA_FT=v end})
+SA_G:AddToggle('SA_HT', {Text='Highlight Target', Default=false, Callback=function(v) L.SA_HT=v end}):AddColorPicker('SA_HTC', {Default=Color3.new(1,0,0), Title='Target Color', Callback=function(v) L.SA_HTC=v end})
 SA_G:AddSlider('SA_FR', {Text='FOV Radius', Default=120, Min=0, Max=800, Rounding=0, Compact=true, Callback=function(v) L.SA_FR=v end})
 SA_G:AddDropdown('SA_SP', {Values={'Mouse','Center Of Screen','Bottom'}, Default=1, Multi=false, Text='Snap Origin', Callback=function(v) L.SA_SP=v end})
 local HBE = Tabs.A:AddLeftGroupbox("Hitbox Expander")
@@ -917,6 +1052,7 @@ end
 local h=lp_h_hum
 local r=lp_h_root
 local isDead=not h or h.Health<=0
+if not isDead and L.NJC and not L.FlyE and UIS:IsKeyDown(Enum.KeyCode.Space) and h.FloorMaterial ~= Enum.Material.Air then h.Jump=true h:ChangeState("Jumping") end
 if not isDead and (L.CJP or cjpR) then
 local t,s=os.clock()-(L.CJPTime or 0),L.CJPStart or 50 local tg=L.CJP and(L.CJPA or 50)or(L.CJPStart or 50)local sl=math.clamp(t/0.25,0,1)
 if L.CJP or sl<1 then cjpR=true h.UseJumpPower=true h.JumpPower=s+(tg-s)*sl else cjpR=false end
@@ -1283,9 +1419,13 @@ local function Panic()
     for _, caches in ipairs({L.ND, L.DD, L.WD, L.AD, L.BD, L.BOD, L.BFD, L.HOD, L.HTD}) do
         for k, v in pairs(caches) do pcall(function() v:Remove() end) caches[k] = nil end
     end
+    for m, lines in pairs(L.SKD) do for _, l in ipairs(lines) do pcall(function() l:Remove() end) end end
+    L.SKD = {}
     for _, b in pairs(L.HD) do for _, s in ipairs(b) do pcall(function() s:Remove() end) end end
     for _, t in pairs(L.Cache.Item) do pcall(function() t:Remove() end) end
     for _, t in pairs(L.Cache.Crate) do pcall(function() t:Remove() end) end
+    table.clear(L.Cache.ESP) table.clear(L.Cache.Item) table.clear(L.Cache.Crate) table.clear(L.Cache.Gun) table.clear(L.Cache.XT)
+
     for _, cA in pairs(L.Cache.XT) do if cA.tx then cA.tx:Remove() end if cA.bg then cA.bg:Destroy() end end
     if SA_FOV then SA_FOV:Remove() end if SA_FOV_O then SA_FOV_O:Remove() end
     if SA_SL then SA_SL:Remove() end if SA_SL_O then SA_SL_O:Remove() end
